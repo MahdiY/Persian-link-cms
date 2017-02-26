@@ -1,0 +1,6 @@
+<IFModule mod_rewrite.c>
+RewriteEngine on     
+RewriteRule ^link-([0-9]*).html link.php?id=$1
+RewriteRule ^page-([0-9]*).html index.php?page=$1
+</IFModule>
+# End Persian Link CMS - www.persianlinkcms.ir
