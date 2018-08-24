@@ -1,11 +1,10 @@
 <?php
 /*
-	Persian Link CMS
-	Powered By www.PersianLinkCMS.ir
-	Author : Mohammad Majidi & MahdiY.ir
-	VER 2.1
-	copyright 2011 - 2015
-		
+ * Persian Link CMS
+ * Powered By www.PersianLinkCMS.ir
+ * Author : Mohammad Majidi & Mahdi Yousefi (MahdiY.ir)
+ * VER 2.2
+ * copyright 2011 - 2018
 */
 class SimplePie_Source
 {

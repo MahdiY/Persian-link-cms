@@ -1,13 +1,12 @@
 <?php
 /*
-	Persian Link CMS
-	Powered By www.PersianLinkCMS.ir
-	Author : Mohammad Majidi & MahdiY.ir
-	VER 2.1
-	copyright 2011 - 2015
-		
+ * Persian Link CMS
+ * Powered By www.PersianLinkCMS.ir
+ * Author : Mohammad Majidi & Mahdi Yousefi (MahdiY.ir)
+ * VER 2.2
+ * copyright 2011 - 2018
 */
-error_reporting(0);
+
 if ((!empty($_SERVER['SCRIPT_FILENAME']) && 'theme.php' == basename($_SERVER['SCRIPT_FILENAME'])) || !is_admin())
 		die ('Please do not load this page directly. Thanks!');
 echo'
@@ -35,7 +34,7 @@ echo'
 								
 							<p>روبات سیستم با استفاده از قابلیت کرون جاب (cron job) قابل استفاده می باشد.<br/>
 							هم اکنون روبات در مسیر زیر قرار دارد:<br/>
-							<pre dir="ltr">'.get_site_url().'robot.php</pre>
+							<pre dir="ltr">'.get_option('site_url').'robot.php</pre>
 							اگر نمی دانید چگونه کرون جاب را برای سیستم فعال کنید کافیست یکی از لینک های زیر را مطالعه کنید</p>
 							<p>
 							<a href="http://forum.persianscript.ir/f133/%D8%A2%D9%85%D9%88%D8%B2%D8%B4-%D9%81%D8%B9%D8%A7%D9%84-%D8%B3%D8%A7%D8%B2%DB%8C-%DA%A9%D8%B1%D9%88%D9%86-%D8%AC%D8%A7%D8%A8%D8%B2-cron-jobs-%D8%AF%D8%B1-%D8%B3%DB%8C-%D9%BE%D9%86%D9%84-cpanel-8689/" target="_blank" class="btn btn-info">آموزش فعال سازی کرون جاب در CPanel</a>

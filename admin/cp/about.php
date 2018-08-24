@@ -1,16 +1,16 @@
 <?php
 /*
-	Persian Link CMS
-	Powered By www.PersianLinkCMS.ir
-	Author : Mohammad Majidi & MahdiY.ir
-	VER 2.1
-	copyright 2011 - 2015
-		
+ * Persian Link CMS
+ * Powered By www.PersianLinkCMS.ir
+ * Author : Mohammad Majidi & Mahdi Yousefi (MahdiY.ir)
+ * VER 2.2
+ * copyright 2011 - 2018
 */
-error_reporting(0);
-if ((!empty($_SERVER['SCRIPT_FILENAME']) && 'theme.php' == basename($_SERVER['SCRIPT_FILENAME'])) || !is_admin())
-		die ('Please do not load this page directly. Thanks!');
-echo'
+
+if ( ( ! empty( $_SERVER['SCRIPT_FILENAME'] ) && 'theme.php' == basename( $_SERVER['SCRIPT_FILENAME'] ) ) || ! is_admin() ) {
+	die ( 'Please do not load this page directly. Thanks!' );
+}
+echo '
 <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">درباره سیستم</h1>
@@ -44,11 +44,12 @@ echo'
 							<div class="col-lg-6">	
 							<div class="panel panel-green">
 							<div class="panel-heading">
-								مهدی یوسفی
+								مهدی یوسفی (MahdiY)
 							</div>
 								<div class="panel-body">
 									<p>برنامه نویس PHP و توسعه دهنده</p>
 									<a href="http://mahdiy.ir/" target="_blank" class="btn btn-outline btn-xs btn-success">سایت شخصی</a>
+									<a href="http://twitter.com/mahdiy_ir" target="_blank" class="btn btn-outline btn-xs btn-info"><i class="fa fa-facebook"></i> توییتر</a>
 								</div>
 								
 								</div>

@@ -1,43 +1,44 @@
 <?php
 /*
-	Persian Link CMS
-	Powered By www.PersianLinkCMS.ir
-	Author : Mohammad Majidi & MahdiY.ir
-	VER 2.1
-	copyright 2011 - 2015
-		
+ * Persian Link CMS
+ * Powered By www.PersianLinkCMS.ir
+ * Author : Mohammad Majidi & Mahdi Yousefi (MahdiY.ir)
+ * VER 2.2
+ * copyright 2011 - 2018
 */
-error_reporting(0);
-if (!empty($_SERVER['SCRIPT_FILENAME']) && 'add.php' == basename($_SERVER['SCRIPT_FILENAME']))
-		die ('Please do not load this page directly. Thanks!');
 
-	$msg = "";	
-	if(isset($_POST['save']))
-	{
-		
-		if(filter_var($_POST['url'], FILTER_VALIDATE_URL)){
-			$addlink = $db->insert('_link' , array('id'=>'' ,'title'=>$_POST['title'] ,'url'=>$_POST['url'] ,'time'=>time() ,'date'=>date("d-m-Y") ,'status'=>$_POST['status']));
-			if ( $addlink ){
-				$msg = '<div class="alert alert-success alert-dismissable">
+if( !empty( $_SERVER['SCRIPT_FILENAME'] ) && 'add.php' == basename( $_SERVER['SCRIPT_FILENAME'] ) ) {
+	die ( 'Please do not load this page directly. Thanks!' );
+}
+
+$msg = "";
+if( isset( $_POST['save'] ) ) {
+
+	if( filter_var( $_POST['url'], FILTER_VALIDATE_URL ) ) {
+		$addlink = $db->insert( '_link', [ 'id'     => '',
+										   'title'  => $_POST['title'],
+										   'url'    => $_POST['url'],
+										   'time'   => time(),
+										   'date'   => date( "d-m-Y" ),
+										   'status' => $_POST['status'] ] );
+		if( $addlink ) {
+			$msg = '<div class="alert alert-success alert-dismissable">
 									<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
 									لینک با موفقیت ارسال شد
 						</div>';
-			}
-			else
-			{
-				$msg = '<div class="alert alert-danger alert-dismissable">
-									<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+		} else {
+			$msg = '<div class="alert alert-danger alert-dismissable"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
 									مشکلی در ثبت لینک بوجود آمده است
 						</div>';
-			}
 		}
-		else
-			$msg = '<div class="alert alert-danger alert-dismissable">
+	} else {
+		$msg = '<div class="alert alert-danger alert-dismissable">
 									<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
 									لینک وارد شده معتبر نمی باشد
 						</div>';
 	}
-echo'		<div class="row">
+}
+echo '		<div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">افزودن لینک</h1>
                 </div>
@@ -46,7 +47,7 @@ echo'		<div class="row">
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
-				'.$msg.'
+				' . $msg . '
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             افزودن لینک تازه

@@ -1,12 +1,12 @@
 <?php
 /*
-	Persian Link CMS
-	Powered By www.PersianLinkCMS.ir
-	Author : Mohammad Majidi & MahdiY.ir
-	VER 2.1
-	copyright 2011 - 2015
-		
+ * Persian Link CMS
+ * Powered By www.PersianLinkCMS.ir
+ * Author : Mohammad Majidi & Mahdi Yousefi (MahdiY.ir)
+ * VER 2.2
+ * copyright 2011 - 2018
 */
+
 $link = null;
 $link_count = 0;
 $link_index = 0;
@@ -16,7 +16,7 @@ function have_link() {
 	global $links, $link_count, $link_index , $count;
 	
 	if ($links && $link_index <= $link_count - $count){
-		$link_count = count($links);
+		$link_count = count( $links );
 		$count = 1;
 		return true;
 	}
@@ -33,31 +33,29 @@ function the_link() {
 		$link_index++;
 		return false;
 	}
-	else if(isset($links[$link_index])){
-		$link = $links[$link_index];
+	else if( isset( $links[ $link_index ] ) ){
+		$link = $links[ $link_index ];
 		$link_index++;
 		return $link;
 	}
 }
 
 function the_id() {
-global $link;
-return $link['id'];
+	global $link;
+	return $link->id;
 }
 
 function the_title() {
-global $link;
-return $link['title'];
+	global $link;
+	return $link->title;
 }
 
 function the_url() {
-global $link;
-$id = $link['id'];
-return get_site_url()."link-$id.html";
+	global $link;
+	return href_link( $link->id );
 }
 
 function the_count() {
-global $link;
-return $link['counter'];
+	global $link;
+	return $link->counter;
 }
-?>

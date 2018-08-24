@@ -1,38 +1,28 @@
 <?php
 /*
-	Persian Link CMS
-	Powered By www.PersianLinkCMS.ir
-	Author : Mohammad Majidi & MahdiY.ir
-	VER 2.1
-	copyright 2011 - 2015
-		
+ * Persian Link CMS
+ * Powered By www.PersianLinkCMS.ir
+ * Author : Mohammad Majidi & Mahdi Yousefi (MahdiY.ir)
+ * VER 2.2
+ * copyright 2011 - 2018
 */
-error_reporting(0);
+
 if ((!empty($_SERVER['SCRIPT_FILENAME']) && 'theme.php' == basename($_SERVER['SCRIPT_FILENAME'])) || !is_admin())
 		die ('Please do not load this page directly. Thanks!');
 	
-	$persianscript = "";
-	if(isset($_POST['save'])){
-		up_option('theme_name' , $_POST['theme_name']);
-		option(true);
-		$persianscript = '<div class="alert alert-success alert-dismissable"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>تغییرات با موفقیت ثبت شد</div>';
+$themes = array_map( 'basename', glob( '../tpl/*', GLOB_ONLYDIR ) );
 
-	}
-	
-	$theme = "";
-	if ($handle = opendir('../tpl')) {
-		while (false !== ($file = readdir($handle))) {
-			if($file == current(explode('.', $file)))
-				if($file == get_theme_name())
-					$theme .= "<option value='{$file}' selected>$file</option>";
-				else
-					$theme .= "<option value='{$file}'>$file</option>";
-			
-		}
-		closedir($handle);
-	}
+$msg = "";
+if ( isset( $_POST['save'] ) && in_array( $_POST['theme_name'], $themes ) ) {
+    update_option( 'theme_name', $_POST['theme_name'] );
+    $msg = '<div class="alert alert-success alert-dismissable"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>تغییرات با موفقیت ثبت شد</div>';
+}
 
-echo'
+$select = "";
+foreach ( $themes as $theme )
+    $select .= sprintf( '<option value="%1$s" %2$s>%1$s</option>', $theme, $theme == get_option('theme_name') ? 'selected' : '' );
+
+?>
 <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">تنظیمات قالب</h1>
@@ -41,7 +31,7 @@ echo'
             </div>
 <div class="row">
                 <div class="col-lg-12">
-                   '.$persianscript.'
+                   <?php echo $msg; ?>
                     <!-- /.panel -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -60,7 +50,7 @@ echo'
                                         <div class="form-group">
                                             <label>انتخاب پوسته</label>
 											<select name="theme_name" class="form-control">
-												'.$theme.'
+												<?php echo $select; ?>
 											</select>
                                         </div>
 
@@ -79,9 +69,4 @@ echo'
                     <!-- /.panel -->
                     
                 </div>
-                </div>										
-	
-	
-	';
-
-?>
+                </div>
