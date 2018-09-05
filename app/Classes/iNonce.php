@@ -9,6 +9,11 @@
  * @version 1
  * @license BSD http://www.opensource.org/licenses/bsd-license.php
  */
+
+namespace App\Classes;
+
+echo "nonce loaded!";
+
 class iNonce {
     /*
      * Nonce Salt

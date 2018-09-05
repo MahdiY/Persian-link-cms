@@ -7,6 +7,9 @@
  * copyright 2011 - 2018
 */
 
+use App\Classes\pdate;
+use App\Models\Option;
+
 $alloptions = null;
 
 function get_option( $option, $default = "" ) {
@@ -18,10 +21,11 @@ function get_option( $option, $default = "" ) {
 	}
 
 	if ( is_null( $alloptions ) ) {
-		$options = $db->get_results( "SELECT option_name, option_value FROM `_options`" );
+		/** @var Option[] $options */
+		$options = Option::all();
 
-		foreach ( $options as $_option => $_value ) {
-			$alloptions[ $_option ] = $_value;
+		foreach ( $options as $_option ) {
+			$alloptions[ $_option->option_name ] = $_option->option_value;
 		}
 	}
 
@@ -61,6 +65,11 @@ function update_option( $option, $value ) {
 	}
 
 	$alloptions[ $option ] = $value;
+}
+
+function pdate($format, $timestamp = NULL)
+{
+	return pdate::pdate($format, $timestamp);
 }
 
 function clean( $string ) {
@@ -197,5 +206,3 @@ function pagination( $pages = '', $range = 5, $admin = false ) {
 		echo "</div>\n";
 	}
 }
-
-?>
