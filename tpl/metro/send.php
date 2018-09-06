@@ -48,8 +48,8 @@
 
         <p>
             کد امنیتی: <br/>
-            <input type="text" name="security" required="required"/>
-            <img src="include/image.php"/>
+            <input type="text" name="security" required="required" autocomplete="off"/>
+            <img src="captcha.php"/>
         </p>
 
         <p><input type="submit" name="submit" value="ارسال لینک"/></p>
