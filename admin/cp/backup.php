@@ -3,7 +3,7 @@
  * Persian Link CMS
  * Powered By www.PersianLinkCMS.ir
  * Author : Mohammad Majidi & Mahdi Yousefi (MahdiY.ir)
- * VER 2.2
+ * Version 3.0
  * copyright 2011 - 2018
 */
 error_reporting(0);

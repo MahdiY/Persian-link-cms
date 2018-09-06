@@ -46,7 +46,7 @@
             border-left: 3px solid #FFFFFF;
             border-right: 3px solid #FFFFFF;
             background-color: #FFFFFF;
-            width: 600;
+            width: 600px;
             height: 100%;
         }
 
@@ -123,11 +123,11 @@
             <p align="center" dir="rtl">
 
                 <img border="0" src="<?php echo theme_dir(); ?>img/logo.jpg"><br>
-                <a href="<?php echo get_option( 'site_url' ); ?>" targer="_blank">صفحه نخست</a> |
-                <a href="mailto:<?php echo get_option( 'email' ); ?>" targer="_blank">تماس با ما</a> |
-                <a href="<?php echo get_option( 'site_url' ); ?>box.php" targer="_blank">لينک باکس</a> |
+                <a href="<?php echo get_option( 'site_url' ); ?>" target="_blank">صفحه نخست</a> |
+                <a href="mailto:<?php echo get_option( 'email' ); ?>" target="_blank">تماس با ما</a> |
+                <a href="<?php echo get_option( 'site_url' ); ?>box.php" target="_blank">لينک باکس</a> |
                 <a href="javascript:popUp('<?php echo get_option( 'site_url' ); ?>send.php')">ارسال لينک</a> |
-                <a href="rss.php" targer="_blank"><img border="0" src="<?php echo theme_dir(); ?>img/feed.gif"></a>
+                <a href="rss.php" target="_blank"><img border="0" src="<?php echo theme_dir(); ?>img/feed.gif"></a>
             </p>
             <hr size="1" color="#F1F6FB" style="margin-top: 0;
  margin-bottom: 0">

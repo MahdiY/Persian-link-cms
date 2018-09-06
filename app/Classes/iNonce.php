@@ -12,8 +12,6 @@
 
 namespace App\Classes;
 
-echo "nonce loaded!";
-
 class iNonce {
     /*
      * Nonce Salt
@@ -60,7 +58,7 @@ class iNonce {
      */
     public static function setTime( $time ) {
         if( $time ) {
-            selft::$time = intval( $time );
+            self::$time = intval( $time );
         }
     }
     /**
