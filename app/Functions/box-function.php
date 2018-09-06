@@ -7,55 +7,53 @@
  * copyright 2011 - 2018
 */
 
-$link = null;
-$link_count = 0;
-$link_index = 0;
-$count = 0;
+use App\Models\Link;
 
-function have_link() {
-	global $links, $link_count, $link_index , $count;
-	
-	if ($links && $link_index <= $link_count - $count){
-		$link_count = count( $links );
-		$count = 1;
-		return true;
-	}
-	else {
-		$link_count = 0;
-		return false;
-	}
+/** @var Link $link */
+$link = NULL;
+
+function have_link()
+{
+	global $links;
+
+	return current($links);
 }
 
-function the_link() {
-	global $links, $link, $link_count, $link_index;
+function the_link()
+{
+	global $links, $link;
 
-	if ($link_index >= $link_count) {
-		$link_index++;
-		return false;
-	}
-	else if( isset( $links[ $link_index ] ) ){
-		$link = $links[ $link_index ];
-		$link_index++;
-		return $link;
-	}
+	/** @var Link $link */
+	$link = (object)current($links);
+	next($links);
+
+	return $link;
 }
 
-function the_id() {
+function the_id()
+{
 	global $link;
+
 	return $link->id;
 }
 
-function the_title() {
+function the_title()
+{
 	global $link;
+
 	return $link->title;
 }
 
-function the_url() {
+function the_url()
+{
 	global $link;
-	return href_link( $link->id );
+
+	return href_link($link->id);
 }
 
-function the_count() {
+function the_count()
+{
 	global $link;
+
 	return $link->counter;
 }

@@ -7,11 +7,22 @@
  * copyright 2011 - 2018
 */
 
-include("include/config.php");
+use App\Models\Link;
 
-$num = get_option('box_num');
-$order = get_option('box_type') == 1 ? 'RAND()' : '`id` DESC';
-$links = $db->get_results( sprintf("SELECT * FROM `_link` where `status` = 1 ORDER BY %s LIMIT 0, %d", $order, $num) );
+include("vendor/autoload.php");
 
-include("include/box-function.php");
-include('tpl/'.get_option('theme_name').'/box.php');
+$links = Link::Active();
+
+if (get_option('box_type') == 1) {
+	$links->inRandomOrder();
+} else {
+	$links->orderBy('id', 'DESC');
+}
+
+$limit = get_option('box_num');
+
+/** @var Link $links */
+$links = $links->limit($limit)->get()->toArray();
+
+include("app/Functions/box-function.php");
+include('tpl/' . get_option('theme_name') . '/box.php');

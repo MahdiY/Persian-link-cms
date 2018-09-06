@@ -7,39 +7,45 @@
  * copyright 2011 - 2018
 */
 
-include( 'include/config.php' );
-include_once( 'include/SimplePie/autoloader.php' );
-set_time_limit( 60 );
+use App\Models\Feed;
+use App\Models\Link;
 
-if ( get_option( 'robo_status' ) == 1 ):
+include('vendor/autoload.php');
 
-	$sql = $db->get_results( "SELECT * FROM `_feeds` WHERE `status` = 1 ORDER BY time DESC" );
+set_time_limit(60);
 
-	foreach ( $sql as $row ) {
-		$feed = new SimplePie();
-		$feed->set_feed_url( $row->link );
-		$feed->enable_cache( false );
-		$feed->set_output_encoding( 'utf-8' );
-		$feed->init();
-		$feed_item = (object) array_reverse( (array) $feed->get_items() );
+if (get_option('robo_status') == 1):
 
-		foreach ( $feed_item as $item ) {
-			$title = htmlentities( $item->get_title() );
-			$Count = $db->get_var( "SELECT COUNT(*) FROM `_link` WHERE `title` = '$title';" );
+	/** @var Feed[] $feeds */
+	$feeds = Feed::Active()->orderBy('time', 'DESC')->get();
 
-			if ( $Count == 0 && filter_var( $item->get_permalink(), FILTER_VALIDATE_URL ) ) {
-				$addlink = $db->insert( '_link', [
+	foreach ($feeds as $feed) {
+		$rss = new SimplePie();
+		$rss->set_feed_url($feed->link);
+		$rss->enable_cache(false);
+		$rss->set_output_encoding('utf-8');
+		$rss->init();
+
+		/** @var SimplePie_Item[] $rss_item */
+		$rss_item = (object)array_reverse((array)$rss->get_items());
+
+		foreach ($rss_item as $item) {
+			$title = htmlentities($item->get_title());
+			$count = Link::where('title', $title)->count();
+
+			if ($count == 0 && filter_var($item->get_permalink(), FILTER_VALIDATE_URL)) {
+				Link::create([
 					'title'  => $title,
 					'url'    => $item->get_permalink(),
 					'time'   => time(),
-					'date'   => date( "d-m-Y" ),
-					'status' => 1
-				] );
+					'date'   => date("d-m-Y"),
+					'status' => 1,
+				]);
 			}
 
 		}
 
-		$db->update( '_feeds', [ 'time' => time() ], [ 'id' => $row->id ] );
+		$feed->update(['time' => time()]);
 	}
 
 endif;

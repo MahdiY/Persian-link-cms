@@ -7,134 +7,101 @@
  * copyright 2011 - 2018
 */
 
-include_once "include/config.php";
+use App\Models\Link;
 
-$offset = get_option( 'page_vahed' );
-$from   = 0;
+include_once "vendor/autoload.php";
 
-if ( isset( $_GET['page'] ) ) {
-	$paged = intval( $_GET['page'] ) - 1;
+$offset = get_option('page_vahed');
 
-	if ( $paged !== - 1 ) {
-		$from = $paged * $offset;
-	}
+$days = Link::Active()->groupBy('date')->orderBy('id', 'DESC')->paginate($offset)->pluck('date')->toArray();
+
+$day = NULL;
+
+/** @var Link[] $links */
+$links = [];
+
+/** @var Link $link */
+$link = NULL;
+
+function have_link()
+{
+	global $days;
+
+	return current($days);
 }
 
-$sql   = sprintf( "SELECT date FROM `_link` WHERE `status` = 1 group by `date` order by `id` DESC LIMIT %d, %d", $from, $offset );
-$links = $db->get_results( $sql );
+function the_link()
+{
+	global $days, $day, $links;
 
-$link           = null;
-$link_count     = 0;
-$link_index     = 0;
-$count          = 0;
-$link_count_day = 0;
-$link_index_day = 0;
-$count_day      = 0;
-$q              = "";
-$q2             = "";
+	$day = current($days);
+	next($days);
 
-function have_link() {
-	global $links, $link_count, $link_index, $count, $db, $q;
+	$links = Link::Active()->where('date', $day)->orderBy('id', 'DESC')->get()->toArray();
 
-	if ( $links && $link_index <= ( $link_count - $count ) ) {
-		$link_count = count( $links );
-		$count      = 1;
-
-		return true;
-	} else {
-		$link_count = 0;
-
-		return false;
-	}
-
+	return $day;
 }
 
-function the_link() {
-	global $links, $link, $link_count, $link_index, $db, $q, $link_index_day, $link_count_day, $count_day;
+function the_date()
+{
+	global $day;
 
-	if ( $link_index >= $link_count ) {
-		$link_index ++;
-
-		return false;
-	} else if ( isset( $links[ $link_index ] ) ) {
-		$link           = $links[ $link_index ];
-		$date           = $links[ $link_index ]->date;
-		$q              = $db->get_results( sprintf( "SELECT * FROM `_link` WHERE `status` = 1 AND `date` = %s order by `id` DESC", db_safe( $date ) ) );
-		$link_count_day = 0;
-		$link_index_day = 0;
-		$count_day      = 0;
-		$link_index ++;
-
-		return $link;
-	}
+	return pdate("l j F Y", strtotime($day));
 }
 
-function the_date() {
-	global $links, $link_index;
+function link_in_day()
+{
+	global $links;
 
-	return pdate( "l j F Y", strtotime( $links[ $link_index - 1 ]->date ) );
+	return current($links);
 }
 
-function link_in_day() {
-	global $q, $link_count_day, $link_index_day, $count_day, $db;
+function the_link_day()
+{
+	global $links, $link;
 
-	if ( $q && $link_index_day <= ( $link_count_day - $count_day ) ) {
-		$link_count_day = count( $q );
-		$count_day      = 1;
+	/** @var Link $link */
+	$link = (object)current($links);
+	next($links);
 
-		return true;
-	} else {
-		$link_count = 0;
-
-		return false;
-	}
+	return $link;
 }
 
-function the_link_day() {
-	global $q, $link_count_day, $link_index_day, $count_day, $db, $q2;
+function the_url()
+{
+	global $link;
 
-	if ( $link_index_day >= $link_count_day ) {
-		$link_index_day ++;
-
-		return false;
-	} else if ( isset( $q[ $link_index_day ] ) ) {
-		$q2 = $q[ $link_index_day ];
-		$link_index_day ++;
-
-		return $q2;
-	}
+	return href_link($link->id);
 }
 
-function the_url() {
-	global $q2;
+function the_title()
+{
+	global $link;
 
-	return href_link( $q2->id );
+	return $link->title;
 }
 
-function the_title() {
-	global $q2;
+function the_id()
+{
+	global $link;
 
-	return $q2->title;
+	return $link->id;
 }
 
-function the_id() {
-	global $q2;
+function the_count()
+{
+	global $link;
 
-	return $q2->id;
+	return $link->counter;
 }
 
-function the_count() {
-	global $q2;
+function page_numbers()
+{
+	global $offset;
+	$num_rows = Link::Active()->groupBy('date')->orderBy('id', 'DESC')->count();
 
-	return $q2->counter;
+	return ceil($num_rows / $offset);
 }
 
-function page_numbers() {
-	global $db, $offset;
-	$db->get_results( "SELECT id from `_link` where `status`='1' group by `date` order by `id` DESC" );
-
-	return ceil( $db->num_rows / $offset );
-}
-
-include( 'tpl/' . get_option( 'theme_name' ) . '/index.php' );
+include('tpl/' . get_option('theme_name') . '/index.php');
 	

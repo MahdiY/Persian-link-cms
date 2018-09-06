@@ -7,35 +7,27 @@
  * copyright 2011 - 2018
 */
 
-if ( ( ! empty( $_SERVER['SCRIPT_FILENAME'] ) && 'links.php' == basename( $_SERVER['SCRIPT_FILENAME'] ) ) || ! is_admin() ) {
-	die ( 'Please do not load this page directly. Thanks!' );
+use App\Models\Link;
+
+if ((!empty($_SERVER['SCRIPT_FILENAME']) && 'links.php' == basename($_SERVER['SCRIPT_FILENAME'])) || !is_admin()) {
+	die ('Please do not load this page directly. Thanks!');
 }
 
-if ( isset( $_GET['active'] ) && isset( $_GET['id'] ) ) {
-	$sql = $db->update( '_link', array( 'status' => intval( $_GET['active'] ) ), array( 'id' => intval( $_GET['id'] ) ) );
-
-	if ( $sql ) {
-		header( "Location: panel.php?" . str_replace( '&active=' . intval( $_GET['active'] ) . '&id=' . intval( $_GET['id'] ), "", $_SERVER['QUERY_STRING'] ) );
-	}
-}
-if ( isset( $_GET['delete'] ) ) {
-	$db->delete( '_link', array( 'id' => intval( $_GET['delete'] ) ) );
-	//	header( "Location: panel.php?" . str_replace( '&delete=' . intval( $_GET['delete'] ), "", $_SERVER['QUERY_STRING'] ) );
+if (isset($_GET['active'], $_GET['id'])) {
+	Link::findOrFail($_GET['id'])
+		->update(['status' => intval($_GET['active'])]);
 }
 
-$offset = 20;
-$from   = 0;
-$paged  = 1;
-
-if ( isset( $_GET['page'] ) && $_GET['page'] > 0 ) {
-	$paged = intval( $_GET['page'] );
-	$from  = ( $paged - 1 ) * $offset;
+if (isset($_GET['delete'])) {
+    Link::destroy($_GET['delete']);
 }
 
-$sql = sprintf( "SELECT * FROM _link ORDER BY `id` DESC LIMIT %d, %d", $from, $offset );
-$sql = $db->get_results( $sql );
+$page = $_GET['page'] ?? 1;
 
-if ( $db->num_rows > 0 ){
+/** @var Link[] $links */
+$links = Link::orderBy('time', 'DESC')->paginate(20);
+
+if ($links->count() > 0){
 
 ?>
 <div class="row">
@@ -50,7 +42,7 @@ if ( $db->num_rows > 0 ){
         <!-- /.panel -->
         <div class="panel panel-default">
             <div class="panel-heading">
-                <i class="fa fa-bar-chart-o fa-fw"></i> مدیریت لینک های ارسال شده - برگه <?php echo $paged; ?>
+                <i class="fa fa-bar-chart-o fa-fw"></i> مدیریت لینک های ارسال شده - برگه <?php echo $page; ?>
                 <div class="pull-right">
 
                 </div>
@@ -70,33 +62,33 @@ if ( $db->num_rows > 0 ){
                                 </thead>
                                 <tbody>
 								<?php
-								foreach ( $sql as $row ) {
+								foreach ($links as $link) {
 
-									if ( $row->status == 1 ) {
+									if ($link->status == 1) {
 										$activebtn = 'btn-warning';
-										$showtext  = 'غیر فعال کردن';
-										$trstatus  = 'default';
-										$code      = '0';
+										$showtext = 'غیر فعال کردن';
+										$trstatus = 'default';
+										$code = '0';
 									} else {
 										$activebtn = 'btn-success';
-										$showtext  = 'فعال کردن';
-										$trstatus  = 'warning';
-										$code      = '1';
+										$showtext = 'فعال کردن';
+										$trstatus = 'warning';
+										$code = '1';
 									}
 									?>
 
                                     <tr class="<?php echo $trstatus; ?>">
-                                        <td><?php echo $row->id; ?></td>
-                                        <td><?php echo $row->title; ?></td>
+                                        <td><?php echo $link->id; ?></td>
+                                        <td><?php echo $link->title; ?></td>
                                         <td>
                                             <a class="btn <?php echo $activebtn; ?> btn-xs"
-                                               href="panel.php?act=links&page=<?php echo $paged; ?>&active=<?php echo $code; ?>&id=<?php echo $row->id; ?>"><i
+                                               href="panel.php?act=links&page=<?php echo $page; ?>&active=<?php echo $code; ?>&id=<?php echo $link->id; ?>"><i
                                                         class="fa fa-check"></i> <?php echo $showtext; ?></a>
                                             <a class="btn btn-info btn-xs" title="مشاهده لینک" target="_blank"
-                                               href="<?php echo href_link( $row->id ); ?>"><i
+                                               href="<?php echo href_link($link->id); ?>"><i
                                                         class="fa fa-link"></i> مشاهده لینک</a>
                                             <a class="btn btn-danger btn-xs" title="حذف"
-                                               href="panel.php?act=links&page=<?php echo $paged; ?>&delete=<?php echo $row->id; ?>"><i
+                                               href="panel.php?act=links&page=<?php echo $page; ?>&delete=<?php echo $link->id; ?>"><i
                                                         class="fa fa-times"></i> حذف</a>
                                         </td>
                                     </tr>
@@ -128,14 +120,15 @@ if ( $db->num_rows > 0 ){
 
     <div class="col-lg-12">
 		<?php
-		$db->get_results( "select id from `_link`" );
-		$num = ceil( $db->num_rows / $offset );
-		echo pagination( $num, 5, true );
+
+		$paginate = $links->toArray();
+
+		echo pagination($paginate['last_page'], 5, true);
 
 		} else {
 			echo '<br/><br/><br/><br/><br/><div class="alert alert-warning alert-dismissable">چیزی یافت نشد!</div>';
-			if ( isset( $_GET['page'] ) ) {
-				header( "Location: panel.php?act=links" );
+			if (isset($_GET['page'])) {
+				header("Location: panel.php?act=links");
 			}
 		}
 		?>

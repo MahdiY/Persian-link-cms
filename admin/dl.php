@@ -8,7 +8,7 @@
 */
 
 session_start();
-include( '../include/config.php' );
+include( '../vendor/autoload.php' );
 
 if( is_admin() ) {
     $file = tr_num( 'PersianCmsLink-backup-' . pdate( "Y-m-d", time() ) . '.sql' );

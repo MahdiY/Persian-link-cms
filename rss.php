@@ -7,49 +7,50 @@
  * copyright 2011 - 2018
 */
 
-header( 'Content-type: text/xml' );
-include( "include/config.php" );
+use App\Models\Link;
+
+header('Content-type: text/xml');
+include("vendor/autoload.php");
 
 echo '<rss version="2.0">
 <channel>
-<title>' . get_option( 'title' ) . '</title>
-<description>' . get_option( 'description' ) . '</description>
-<link>' . get_option( 'site_url' ) . '</link>';
+<title>' . get_option('title') . '</title>
+<description>' . get_option('description') . '</description>
+<link>' . get_option('site_url') . '</link>';
 
-$num   = 10;
-$type  = "`id`";
+$num = 10;
+$type = "id";
 $count = "";
 
-if ( isset( $_GET['type'] ) && $_GET['type'] == "rand" ) {
+if (isset($_GET['type']) && $_GET['type'] == "rand") {
 	$type = "RAND()";
-} elseif ( isset( $_GET['type'] ) && $_GET['type'] == "popular" ) {
+} elseif (isset($_GET['type']) && $_GET['type'] == "popular") {
 	$type = "counter";
 }
 
-if ( isset( $_GET['num'] ) && $_GET['num'] <= 50 ) {
-	$num = intval( $_GET['num'] );
+if (isset($_GET['num']) && $_GET['num'] <= 50) {
+	$num = intval($_GET['num']);
 }
 
-$links = $db->get_results( "SELECT * FROM `_link` WHERE `status` = 1 ORDER BY $type DESC limit $num" );
+/** @var Link[] $links */
+$links = Link::Active()->orderBy($type)->limit($num)->get();
 
-foreach ( $links as $link ) {
+foreach ($links as $link) {
 
-	$url  = href_link( $link->id );
-	$date = pdate( "l j F Y", strtotime( $link->date ) ) . " - " . pdate( "H:i", $link->time );
-	if ( isset( $_GET['count'] ) && $_GET['count'] ) {
+	$url = href_link($link->id);
+	$date = $link->date("l j F Y") . " - " . $link->time("H:i");
+
+	if (isset($_GET['count']) && $_GET['count']) {
 		$count = " - " . $link->counter;
 	}
 
-	echo "
-	<item>
-		<title>$link->title$count</title>
-		<description>$date</description>
-		<link>$url</link>
-	</item>  
-	";
+	echo "<item>
+			<title>{$link->title}{$count}</title>
+			<description>{$date}</description>
+			<link>{$url}</link>
+		</item>";
 }
-echo "
 
+?>
 </channel>
 </rss>
-";

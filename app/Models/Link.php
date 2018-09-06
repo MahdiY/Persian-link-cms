@@ -27,6 +27,17 @@ class Link extends Model
 
 	protected $table = '_link';
 
+	protected $fillable = [
+		'title',
+		'url',
+		'time',
+		'date',
+		'counter',
+		'status',
+	];
+
+	public $timestamps = NULL;
+
 	// Function
 
 	public function date($format)
@@ -44,6 +55,11 @@ class Link extends Model
 	public function scopeActive(Builder $query)
 	{
 		return $query->where('status', 1);
+	}
+
+	public function scopeDeactive(Builder $query)
+	{
+		return $query->where('status', 0);
 	}
 
 }

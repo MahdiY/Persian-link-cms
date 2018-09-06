@@ -10,61 +10,68 @@
 use App\Classes\pdate;
 use App\Models\Option;
 
-$alloptions = null;
+$alloptions = NULL;
 
-function get_option( $option, $default = "" ) {
-	global $db, $alloptions;
+function get_option($option, $default = "")
+{
+	global $alloptions;
 
-	$option = trim( $option );
-	if ( empty( $option ) ) {
+	$option = trim($option);
+	if (empty($option)) {
 		return false;
 	}
 
-	if ( is_null( $alloptions ) ) {
+	if (is_null($alloptions)) {
 		/** @var Option[] $options */
 		$options = Option::all();
 
-		foreach ( $options as $_option ) {
-			$alloptions[ $_option->option_name ] = $_option->option_value;
+		foreach ($options as $_option) {
+			$alloptions[$_option->option_name] = $_option->option_value;
 		}
 	}
 
-	if ( isset( $alloptions[ $option ] ) ) {
-		return $alloptions[ $option ];
+	if (isset($alloptions[$option])) {
+		return $alloptions[$option];
 	}
 
-	$value = $db->get_var( "SELECT option_value FROM `_options` WHERE `option_name` = '$option'" );
+	/** @var Option $value */
+	$value = Option::where('optiona_name', $option)->first();
 
-	if ( is_null( $value ) ) {
+	if (is_null($value)) {
 		return $default;
 	}
 
-	$alloptions[ $option ] = $value;
+	$alloptions[$option] = $value->option_value;
 
-	return $value;
+	return $value->option_value;
 }
 
-function update_option( $option, $value ) {
-	global $db, $alloptions;
+function update_option($option, $value)
+{
+	global $alloptions;
 
-	$option = trim( $option );
+	$option = trim($option);
 
-	if ( empty( $option ) ) {
+	if (empty($option)) {
 		return false;
 	}
 
-	$option = clean( $option );
-	$value  = clean( $value );
+	$option = clean($option);
+	$value = clean($value);
 
-	$count = $db->get_var( "SELECT COUNT(*) FROM `_options` WHERE `option_name` = '$option'" );
+	$alloptions[$option] = $value;
 
-	if ( $count ) {
-		$db->update( '_options', [ 'option_value' => $value ], [ 'option_name' => $option ] );
+	/** @var Option $option */
+	$option = Option::where('option_name', $option)->first();
+
+	if ($option) {
+		$option->update(['option_value' => $value]);
 	} else {
-		$db->insert( '_options', [ 'option_name' => $option, 'option_value' => $value ] );
+		Option::create([
+			'option_name'  => $option,
+			'option_value' => $value,
+		]);
 	}
-
-	$alloptions[ $option ] = $value;
 }
 
 function pdate($format, $timestamp = NULL)
@@ -72,59 +79,64 @@ function pdate($format, $timestamp = NULL)
 	return pdate::pdate($format, $timestamp);
 }
 
-function clean( $string ) {
-	global $db;
+function clean($string)
+{
+	global $capsule;
 
-	$string = trim( $string );
-	$string = strip_tags( $string, '<a><img>' );
-	$string = mysqli_real_escape_string( $db->dbh, $string );
+	$string = trim($string);
+	$string = strip_tags($string, '<a><img>');
+//	$string = mysqli_real_escape_string($capsule->getConnection(), $string);
 
 	return $string;
 }
 
-function db_safe( $value ) {
-	global $db;
+function db_safe($value)
+{
+	global $capsule;
 
-	return "'" . mysqli_real_escape_string( $db->dbh, $value ) . "'";
+	return "'" . mysqli_real_escape_string($capsule->getConnection(), $value) . "'";
 }
 
-function version() {
+function version()
+{
 	global $db;
 
 	return $db->db_version();
 }
 
-function theme_dir() {
-	return get_option( 'site_url' ) . 'tpl/' . get_option( 'theme_name' ) . '/';
+function theme_dir()
+{
+	return get_option('site_url') . 'tpl/' . get_option('theme_name') . '/';
 }
 
-function backup_tables() {
+function backup_tables()
+{
 	global $db;
 	$return = "";
-	$table  = "_link";
+	$table = "_link";
 
-	$result     = mysqli_query( $db->dbh, 'SELECT * FROM ' . $table );
-	$num_fields = mysqli_num_fields( $result );
+	$result = mysqli_query($db->dbh, 'SELECT * FROM ' . $table);
+	$num_fields = mysqli_num_fields($result);
 
 	$return .= 'DROP TABLE ' . $table . ";\n";
-	$row2   = mysqli_fetch_row( mysqli_query( $db->dbh, 'SHOW CREATE TABLE ' . $table ) );
-	$return .= str_replace( "\n", "", $row2[1] ) . ";\n";
+	$row2 = mysqli_fetch_row(mysqli_query($db->dbh, 'SHOW CREATE TABLE ' . $table));
+	$return .= str_replace("\n", "", $row2[1]) . ";\n";
 
-	for ( $i = 0; $i < $num_fields; $i ++ ) {
+	for ($i = 0; $i < $num_fields; $i++) {
 
-		while( $row = mysqli_fetch_row( $result ) ) {
+		while ($row = mysqli_fetch_row($result)) {
 
 			$return .= 'INSERT INTO ' . $table . ' VALUES(';
 
-			for ( $j = 0; $j < $num_fields; $j ++ ) {
-				$row[ $j ] = addslashes( $row[ $j ] );
-				$row[ $j ] = preg_replace( "#\n#", "\\n", $row[ $j ] );
-				if ( isset( $row[ $j ] ) ) {
-					$return .= '"' . $row[ $j ] . '"';
+			for ($j = 0; $j < $num_fields; $j++) {
+				$row[$j] = addslashes($row[$j]);
+				$row[$j] = preg_replace("#\n#", "\\n", $row[$j]);
+				if (isset($row[$j])) {
+					$return .= '"' . $row[$j] . '"';
 				} else {
 					$return .= '""';
 				}
-				if ( $j < ( $num_fields - 1 ) ) {
+				if ($j < ($num_fields - 1)) {
 					$return .= ',';
 				}
 			}
@@ -137,70 +149,84 @@ function backup_tables() {
 	echo $return;
 }
 
-function is_admin() {
-	$username = isset( $_SESSION['user_login'] ) ? $_SESSION['user_login'] : "";
-	$password = isset( $_SESSION['user_passw'] ) ? $_SESSION['user_passw'] : "";
+function is_admin()
+{
+	$username = isset($_SESSION['user_login']) ? $_SESSION['user_login'] : "";
+	$password = isset($_SESSION['user_passw']) ? $_SESSION['user_passw'] : "";
 
-	return $password == get_option( 'user_pass' ) && $username == get_option( 'user_name' );
+	return $password == get_option('user_pass') && $username == get_option('user_name');
 }
 
-function dbsize() {
+function dbsize()
+{
 	global $db;
 
 	$dbsize = 0;
-	$rows   = $db->get_results( "SHOW TABLE STATUS" );
+	$rows = $db->get_results("SHOW TABLE STATUS");
 
-	foreach ( $rows as $row ) {
+	foreach ($rows as $row) {
 		$dbsize += $row->Data_length + $row->Index_length;
 	}
 
-	return 'کیلو بایت<b>' . round( ( $dbsize / 1024 ), 1 ) . "\n\n" . '</b>';
+	return 'کیلو بایت<b>' . round(($dbsize / 1024), 1) . "\n\n" . '</b>';
 }
 
-function href_link( $id ) {
-	return get_option( 'site_url' ) . sprintf( "link-%d.html", $id );
+function href_link($id)
+{
+	return get_option('site_url') . sprintf("link-%d.html", $id);
 }
 
-function versionplcms() {
+function versionplcms()
+{
 	return '2.2';
 }
 
-function versionchecker() {
-	return 'http://www.persianlinkcms.ir/lastversion.txt';
+function versionchecker()
+{
+	try {
+
+		$url = 'http://www.persianlinkcms.ir/lastversion.txt';
+		$version = file_get_contents($url, true);
+		return floatval($version);
+
+	} catch (Exception $exception) {
+		return versionplcms();
+	}
 }
 
-function pagination( $pages = '', $range = 5, $admin = false ) {
-	$showitems = ( $range * 2 ) + 1;
-	$before    = "";
+function pagination($pages = '', $range = 5, $admin = false)
+{
+	$showitems = ($range * 2) + 1;
+	$before = "";
 	global $paged;
-	if ( empty( $paged ) ) {
+	if (empty($paged)) {
 		$paged = 1;
 	}
 
-	if ( $admin ) {
+	if ($admin) {
 		$before = "act=links&";
 	}
 
-	if ( $pages !== 1 ) {
+	if ($pages !== 1) {
 
 		echo "<div class=\"pagination\"><span>صفحه " . $paged . " از " . $pages . "</span>";
-		if ( $paged > 2 && $paged > $range + 1 && $showitems < $pages ) {
+		if ($paged > 2 && $paged > $range + 1 && $showitems < $pages) {
 			echo "<a href='?" . $before . "page=1'>&laquo; اولین</a>";
 		}
-		if ( $paged > 1 && $showitems < $pages ) {
-			echo "<a href='?" . $before . "page=" . ( $paged - 1 ) . "'>&lsaquo; قبلی</a>";
+		if ($paged > 1 && $showitems < $pages) {
+			echo "<a href='?" . $before . "page=" . ($paged - 1) . "'>&lsaquo; قبلی</a>";
 		}
 
-		for ( $i = 1; $i <= $pages; $i ++ ) {
-			if ( 1 != $pages && ( ! ( $i >= $paged + $range + 1 || $i <= $paged - $range - 1 ) || $pages <= $showitems ) ) {
-				echo ( $paged == $i ) ? "<span class=\"current\">" . $i . "</span>" : "<a href='?" . $before . "page=" . $i . "' class=\"inactive\">" . $i . "</a>";
+		for ($i = 1; $i <= $pages; $i++) {
+			if (1 != $pages && (!($i >= $paged + $range + 1 || $i <= $paged - $range - 1) || $pages <= $showitems)) {
+				echo ($paged == $i) ? "<span class=\"current\">" . $i . "</span>" : "<a href='?" . $before . "page=" . $i . "' class=\"inactive\">" . $i . "</a>";
 			}
 		}
 
-		if ( $paged < $pages && $showitems < $pages ) {
-			echo "<a href=\"?" . $before . "page=" . ( $paged + 1 ) . "\">بعدی &rsaquo;</a>";
+		if ($paged < $pages && $showitems < $pages) {
+			echo "<a href=\"?" . $before . "page=" . ($paged + 1) . "\">بعدی &rsaquo;</a>";
 		}
-		if ( $paged < $pages - 1 && $paged + $range - 1 < $pages && $showitems < $pages ) {
+		if ($paged < $pages - 1 && $paged + $range - 1 < $pages && $showitems < $pages) {
 			echo "<a href='?" . $before . "page=" . $pages . "'>آخرین &raquo;</a>";
 		}
 		echo "</div>\n";

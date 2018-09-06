@@ -7,46 +7,57 @@
  * copyright 2011 - 2018
 */
 
-include_once "include/config.php";
+use App\Models\Link;
 
-if ( isset( $_GET['id'] ) ):
+include_once "vendor/autoload.php";
 
-	$id   = intval( $_GET['id'] );
-	$link = $db->get_row( sprintf( "SELECT * FROM `_link` where `id` = '%d'", $id ) );
-	$db->update( '_link', [ 'counter' => $link->counter + 1 ], [ 'id' => $id ] );
+if (isset($_GET['id'])):
 
-	$prev = $db->get_var( sprintf( "SELECT * FROM `_link` where `id` < '%d' ORDER BY id DESC", $id ) );
+	$id = intval($_GET['id']);
 
-	$prev = is_null( $prev ) ? $id : $prev;
+	/** @var Link $link */
+	$link = Link::findOrFail($id);
 
-	$next = $db->get_var( sprintf( "SELECT * FROM `_link` where `id` > '%d' ORDER BY id ASC", $id ) );
+	$link->increment('counter');
 
-	$next = is_null( $next ) ? $id : $next;
+	/** @var Link $prev */
+	$prev = Link::where('id', '<', $id)->orderBy('id', 'DESC')->first();
 
-	function next_link() {
+	$prev = is_null($prev) ? $id : $prev->id;
+
+	/** @var Link $next */
+	$next = Link::where('id', '>', $id)->orderBy('id', 'ASC')->first();
+
+	$next = is_null($next) ? $id : $next->id;
+
+	function next_link()
+	{
 		global $next;
 
 		return "link-$next.html";
 	}
 
-	function prev_link() {
+	function prev_link()
+	{
 		global $prev;
 
 		return "link-$prev.html";
 	}
 
-	function the_link() {
+	function the_link()
+	{
 		global $link;
 
 		return $link->url;
 	}
 
-	function the_title() {
+	function the_title()
+	{
 		global $link;
 
 		return $link->title;
 	}
 
-	include( 'tpl/' . get_option( 'theme_name' ) . '/link.php' );
+	include('tpl/' . get_option('theme_name') . '/link.php');
 
 endif;

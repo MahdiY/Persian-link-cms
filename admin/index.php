@@ -8,7 +8,7 @@
 */
 
 session_start();
-include( "../include/config.php" );
+include( "../vendor/autoload.php" );
 $error = '';
 
 if( is_admin() ) {
@@ -99,7 +99,7 @@ if( isset( $_POST['login'] ) ) {
                                        value="">
                             </div>
                             <div class="form-group">
-                                کد امنیتی: <img border="0" src="../include/image.php"/>
+                                کد امنیتی: <img border="0" src="../captcha.php"/>
                             </div>
                             <div class="form-group">
                                 <input class="form-control" placeholder="ورود کد امنیتی" name="security" type="text">

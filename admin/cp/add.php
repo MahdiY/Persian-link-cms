@@ -7,35 +7,42 @@
  * copyright 2011 - 2018
 */
 
-if( !empty( $_SERVER['SCRIPT_FILENAME'] ) && 'add.php' == basename( $_SERVER['SCRIPT_FILENAME'] ) ) {
-	die ( 'Please do not load this page directly. Thanks!' );
+use App\Models\Link;
+
+if (!empty($_SERVER['SCRIPT_FILENAME']) && 'add.php' == basename($_SERVER['SCRIPT_FILENAME'])) {
+	die ('Please do not load this page directly. Thanks!');
 }
 
 $msg = "";
-if( isset( $_POST['save'] ) ) {
+if (isset($_POST['save'])) {
 
-	if( filter_var( $_POST['url'], FILTER_VALIDATE_URL ) ) {
-		$addlink = $db->insert( '_link', [ 'id'     => '',
-										   'title'  => $_POST['title'],
-										   'url'    => $_POST['url'],
-										   'time'   => time(),
-										   'date'   => date( "d-m-Y" ),
-										   'status' => $_POST['status'] ] );
-		if( $addlink ) {
+	if (filter_var($_POST['url'], FILTER_VALIDATE_URL)) {
+		$addlink = Link::create([
+			'id'     => '',
+			'title'  => $_POST['title'],
+			'url'    => $_POST['url'],
+			'time'   => time(),
+			'date'   => date("d-m-Y"),
+			'status' => $_POST['status'],
+		]);
+
+		if ($addlink) {
 			$msg = '<div class="alert alert-success alert-dismissable">
-									<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-									لینک با موفقیت ارسال شد
-						</div>';
+						<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+						لینک با موفقیت ارسال شد.
+					</div>';
 		} else {
-			$msg = '<div class="alert alert-danger alert-dismissable"><button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-									مشکلی در ثبت لینک بوجود آمده است
-						</div>';
+			$msg = '<div class="alert alert-danger alert-dismissable">
+						<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+						مشکلی در ثبت لینک بوجود آمده است.
+					</div>';
 		}
+
 	} else {
 		$msg = '<div class="alert alert-danger alert-dismissable">
-									<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-									لینک وارد شده معتبر نمی باشد
-						</div>';
+					<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+					لینک وارد شده معتبر نمی باشد.
+				</div>';
 	}
 }
 echo '		<div class="row">

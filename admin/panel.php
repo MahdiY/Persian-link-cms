@@ -8,7 +8,7 @@
 */
 
 session_start();
-include( "../include/config.php" );
+include( "../vendor/autoload.php" );
 
 if ( isset( $_GET['act'] ) && $_GET['act'] == "logout" ) {
 	unset( $_SESSION['user_login'], $_SESSION['user_passw'] );
